@@ -2,7 +2,7 @@
 const express = require('express');
 const cors = require('cors')
 const bodyParser = require('body-parser');
-const morgan = require('morgan');
+// const morgan = require('morgan');
 const path = require('path');
 
 const app = express();
@@ -11,21 +11,22 @@ app.use(cors())
 app.use(bodyParser.urlencoded({ extended:false }))
 app.use(bodyParser.json())
 
+const mssql = require('./db')
+const { sql,db } = mssql
+
 // Setup logger
-app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :response-time ms'));
+// app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :response-time ms'));
 
 // Serve static assets
 app.use(express.static(path.resolve(__dirname, '..', 'build')))
 
-const mssql = require('./db')
-const { sql,db } = mssql
+
 
 app.get('/user', (req, res) => {
   db.then(() => {
     return sql.query`select * from tb_huodong order by createdAt desc`
   })
     .then(result => {
-      console.log(result)
       res.send(result)
     })
     .catch(err => {console.error('sql error:',err)})
@@ -33,7 +34,6 @@ app.get('/user', (req, res) => {
 
 app.post('/user/completed', (req, res) => {
   const { id } = req.body
-  console.log(id);
   db.then(() => {
     const request = new sql.Request()
     return request
@@ -53,7 +53,6 @@ app.post('/user/completed', (req, res) => {
 
 app.post('/appointment/completed', (req, res) => {
   const { id } = req.body
-  console.log(id);
   db.then(() => {
     const request = new sql.Request()
     return request
@@ -107,14 +106,12 @@ app.get('/appointment', (req,res) => {
     `
   })
     .then(result => {
-      console.log(result)
       res.send(result)
     })
     .catch(err => {console.error('sql error:',err)})
 })
 
 app.post('/appointment', (req,res) => {
-  console.log(req.body);
   // if(req.bdoy){
     const { name,phone,bao,kuan,price } = req.body
     db.then(() => {
@@ -140,7 +137,6 @@ app.post('/appointment', (req,res) => {
 })
 
 app.post('/liangfang', (req,res) => {
-  console.log(req.body);
   // if(req.bdoy){
     const { name,phone,area } = req.body
     db.then(() => {
