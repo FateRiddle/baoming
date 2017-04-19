@@ -11,14 +11,14 @@ app.use(cors())
 app.use(bodyParser.urlencoded({ extended:false }))
 app.use(bodyParser.json())
 
-const sql = require('mssql');
-const db = sql.connect("mssql://youcb:DJit9379@youcaibao.sqlserver.rds.aliyuncs.com:3433/youcb_dev")
-
 // Setup logger
 app.use(morgan(':remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] :response-time ms'));
 
 // Serve static assets
-app.use(express.static(path.resolve(__dirname, '..', 'build')));
+app.use(express.static(path.resolve(__dirname, '..', 'build')))
+
+const mssql = require('./db')
+const { sql,db } = mssql
 
 app.get('/user', (req, res) => {
   db.then(() => {
